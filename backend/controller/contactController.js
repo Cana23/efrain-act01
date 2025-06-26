@@ -1,13 +1,37 @@
 const { db } = require("../firebase/firebaseConfig");
 
 const saveContact = async (req, res) => {
-  const { nombre, correo, telefono, mensaje } = req.body;
+  const { nombre, correo, telefono, mensaje, token } = req.body;
 
-  if (!nombre || !correo || !telefono || !mensaje) {
+  if (!nombre || !correo || !telefono || !mensaje || !token) {
     return res.status(400).json({ error: "Todos los campos son obligatorios" });
   }
 
   try {
+    // Validar token con Google reCAPTCHA
+    const captchaResponse = await fetch(
+      "https://www.google.com/recaptcha/api/siteverify",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+        },
+        body: new URLSearchParams({
+          secret: process.env.RECAPTCHA_SECRET_KEY,
+          response: token,
+        }),
+      }
+    );
+
+    const data = await captchaResponse.json();
+
+    if (!data.success) {
+      return res
+        .status(403)
+        .json({ error: "Fallo la verificación de reCAPTCHA" });
+    }
+
+    // Guardar en Firebase
     await db.collection("contact").add({
       nombre,
       correo,
@@ -18,7 +42,7 @@ const saveContact = async (req, res) => {
 
     res.status(200).json({ message: "Formulario enviado con éxito" });
   } catch (error) {
-    console.error("Error al guardar contacto:", error);
+    console.error("Error:", error);
     res.status(500).json({ error: "Error interno del servidor" });
   }
 };

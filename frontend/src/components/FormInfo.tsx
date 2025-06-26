@@ -1,7 +1,9 @@
-// src/components/ContactForm.tsx
 import { useState } from "react";
+import ReCAPTCHA from "react-google-recaptcha";
+
 
 const ContactForm = () => {
+  const [recaptchaToken, setRecaptchaToken] = useState<string | null>(null);
   const [form, setForm] = useState({
     nombre: "",
     correo: "",
@@ -18,13 +20,18 @@ const ContactForm = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
+    if (!recaptchaToken) {
+      alert("Por favor completa el reCAPTCHA");
+      return;
+    }
+
+
+
     try {
       const res = await fetch("http://localhost:5000/api/contact", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(form),
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ ...form, token: recaptchaToken }),
       });
 
       if (res.ok) {
@@ -87,8 +94,16 @@ const ContactForm = () => {
           y nuestra{" "}
           <a href="/privacidad" className="text-blue-600 hover:underline">
             Política de Privacidad
-          </a>.
+          </a>
+          .
         </p>
+      </div>
+      <div className="flex justify-center my-4">
+        <ReCAPTCHA
+          onChange={(token) => setRecaptchaToken(token)}
+          sitekey="6Le41G4rAAAAAOtLXtLHPNcNUeCNN4f6F4-l6y12"
+          className="mx-auto"
+        />
       </div>
       <div className="flex justify-center">
         <button
