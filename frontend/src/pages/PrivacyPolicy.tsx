@@ -1,4 +1,4 @@
-export default function ToS() {
+export default function PrivacyPolicy() {
   return (
     <div className="flex items-center justify-center p-4">
       <div className="max-w-2xl w-full bg-white p-8 rounded-2xl shadow-lg">

@@ -3,12 +3,8 @@ const { db } = require("../firebase/firebaseConfig");
 const saveContact = async (req, res) => {
   const { nombre, correo, telefono, mensaje, token } = req.body;
 
-  if (!nombre || !correo || !telefono || !mensaje || !token) {
-    return res.status(400).json({ error: "Todos los campos son obligatorios" });
-  }
-
   try {
-    // Validar token con Google reCAPTCHA
+    // Verificar reCAPTCHA
     const captchaResponse = await fetch(
       "https://www.google.com/recaptcha/api/siteverify",
       {

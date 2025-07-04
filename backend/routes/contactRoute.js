@@ -1,7 +1,12 @@
 const express = require("express");
-const router = express.Router();
 const { saveContact } = require("../controller/contactController");
+const {
+  contactValidationRules,
+  validate,
+} = require("../validators/contactValidator");
 
-router.post("/contact", saveContact);
+const router = express.Router();
+
+router.post("/contact", contactValidationRules, validate, saveContact);
 
 module.exports = router;
