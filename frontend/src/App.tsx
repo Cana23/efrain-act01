@@ -7,6 +7,7 @@ import CRM from "./pages/CRM";
 import Login from "./pages/Login";
 import PrivateRoute from "./components/PrivateRoute";
 import { AuthProvider } from "./context/authContext";
+import Protected from "./pages/Protected";
 
 const App = () => {
   return (
@@ -27,6 +28,7 @@ const App = () => {
               </PrivateRoute>
             }
           />
+          <Route path="/protected" element={<Protected />} />
         </Routes>
       </main>
       </Router>

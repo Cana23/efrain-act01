@@ -1,0 +1,60 @@
+openapi: 3.0.0
+info:
+  title: Mini CRM API
+  description: API para gestionar leads desde la landing page y CRM
+  version: 1.0.0
+servers:
+  - url: http://localhost:5000/api
+
+paths:
+  /contact:
+    post:
+      summary: Enviar formulario de contacto
+      tags:
+        - Contacto
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                nombre:
+                  type: string
+                correo:
+                  type: string
+                telefono:
+                  type: string
+                mensaje:
+                  type: string
+                token:
+                  type: string
+      responses:
+        '200':
+          description: Formulario enviado con éxito
+        '400':
+          description: Error en la solicitud
+        '500':
+          description: Error en el servidor
+
+  /auth/login:
+    post:
+      summary: Login de administrador
+      tags:
+        - Autenticación
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                password:
+                  type: string
+      responses:
+        '200':
+          description: Login exitoso
+        '401':
+          description: Credenciales inválidas

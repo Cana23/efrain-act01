@@ -6,7 +6,7 @@ const PrivateRoute = ({ children }: { children: JSX.Element }) => {
   const { token } = useContext(AuthContext);
 
   if (!token) {
-    return <Navigate to="/login" replace />;
+    return <Navigate to="/protected" replace />;
   }
 
   return children;
