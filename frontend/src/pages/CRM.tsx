@@ -26,7 +26,7 @@ const CRM = () => {
     setError("");
     try {
       const res = await fetch(
-        `http://localhost:5000/api/leads?page=${page}&limit=10`,
+        `${import.meta.env.VITE_API_URL}/api/leads?page=${page}&limit=10`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -49,7 +49,7 @@ const CRM = () => {
 
   const handleChangeEstado = async (id: string, estado: string) => {
     try {
-      const res = await fetch(`http://localhost:5000/api/leads/${id}`, {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/leads/${id}`, {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
