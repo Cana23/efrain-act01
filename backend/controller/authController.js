@@ -1,6 +1,7 @@
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
-const { db } = require("../firebase/firebaseConfig");
+const { PrismaClient } = require("@prisma/client");
+const prisma = new PrismaClient();
 
 const login = async (req, res) => {
   const { email, password } = req.body;
@@ -12,17 +13,11 @@ const login = async (req, res) => {
   }
 
   try {
-    const snapshot = await db
-      .collection("admins")
-      .where("email", "==", email)
-      .limit(1)
-      .get();
+    const admin = await prisma.admin.findUnique({ where: { email } });
 
-    if (snapshot.empty) {
+    if (!admin) {
       return res.status(401).json({ error: "Credenciales inválidas." });
     }
-
-    const admin = snapshot.docs[0].data();
 
     const isMatch = await bcrypt.compare(password, admin.passwordHash);
     if (!isMatch) {
@@ -30,7 +25,7 @@ const login = async (req, res) => {
     }
 
     const token = jwt.sign(
-      { uid: snapshot.docs[0].id, email: admin.email, nombre: admin.nombre },
+      { uid: admin.id, email: admin.email, nombre: admin.nombre },
       process.env.JWT_SECRET,
       { expiresIn: "2h" }
     );
@@ -50,33 +45,29 @@ const registerAdmin = async (req, res) => {
   }
 
   try {
-    const existing = await db
-      .collection("admins")
-      .where("email", "==", email)
-      .get();
-    if (!existing.empty) {
+    const existing = await prisma.admin.findUnique({ where: { email } });
+    if (existing) {
       return res.status(400).json({ error: "El email ya está registrado" });
     }
 
     const passwordHash = await bcrypt.hash(password, 10);
 
-    const adminData = {
-      email,
-      nombre,
-      passwordHash,
-      rol: rol || "superadmin",
-    };
-
-    const adminRef = await db.collection("admins").add(adminData);
+    const newAdmin = await prisma.admin.create({
+      data: {
+        email,
+        nombre,
+        passwordHash,
+        rol: rol || "superadmin",
+      },
+    });
 
     res
       .status(201)
-      .json({ message: "Administrador registrado", id: adminRef.id });
+      .json({ message: "Administrador registrado", id: newAdmin.id });
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: "Error interno del servidor" });
   }
 };
-
 
 module.exports = { login, registerAdmin };

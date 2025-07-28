@@ -1,0 +1,15 @@
+node_modules
+.git
+.gitignore
+Dockerfile
+Dockerfile*
+README.md
+npm-debug.log
+yarn-error.log
+.vscode
+.idea
+*.log
+*.tsbuildinfo
+.env
+serviceAccountKey.json
+/generated/prisma

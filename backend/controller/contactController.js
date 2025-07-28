@@ -1,4 +1,3 @@
-const { db } = require("../firebase/firebaseConfig");
 const fetch = require("node-fetch");
 const nodemailer = require("nodemailer");
 
@@ -88,22 +87,22 @@ const saveContact = async (req, res) => {
     }
 
     // Guardar en Firebase
-    const leadRef = await db.collection("contact").add({
-      nombre,
-      correo,
-      telefono,
-      mensaje,
-      estado: "nuevo",
-      fecha: new Date().toISOString(),
+    const lead = await prisma.contact.create({
+      data: {
+        nombre,
+        correo,
+        telefono,
+        mensaje,
+        estado: "nuevo",
+        fecha: new Date(),
+      },
     });
-
     // Enviar notificación por correo
     await sendNotification({ nombre, mensaje });
 
-    res.status(200).json({
-      message: "Formulario enviado con éxito",
-      id: leadRef.id,
-    });
+    res
+      .status(200)
+      .json({ message: "Formulario enviado con éxito", id: lead.id });
   } catch (error) {
     console.error("Error en saveContact:", error);
     res.status(500).json({ error: "Error interno del servidor" });

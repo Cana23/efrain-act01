@@ -1,20 +1,15 @@
-const { db } = require("../firebase/firebaseConfig");
+const { PrismaClient } = require("@prisma/client");
+const prisma = new PrismaClient();
 
 const getLeads = async (req, res) => {
   const page = parseInt(req.query.page) || 1;
   const limit = parseInt(req.query.limit) || 10;
 
   try {
-    const snapshot = await db
-      .collection("contact")
-      .orderBy("fecha", "desc")
-      .offset((page - 1) * limit)
-      .limit(limit)
-      .get();
-
-    const leads = [];
-    snapshot.forEach((doc) => {
-      leads.push({ id: doc.id, ...doc.data() });
+    const leads = await prisma.contact.findMany({
+      skip: (page - 1) * limit,
+      take: limit,
+      orderBy: { fecha: "desc" },
     });
 
     res.status(200).json({ leads });
@@ -33,7 +28,11 @@ const updateLeadStatus = async (req, res) => {
   }
 
   try {
-    await db.collection("contact").doc(id).update({ estado });
+    await prisma.contact.update({
+      where: { id: parseInt(id) },
+      data: { estado },
+    });
+
     res.status(200).json({ message: "Estado actualizado correctamente." });
   } catch (error) {
     console.error(error);
