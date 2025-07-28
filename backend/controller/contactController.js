@@ -1,5 +1,7 @@
-const fetch = require("node-fetch");
+const fetch = (...args) => import('node-fetch').then(mod => mod.default(...args));
 const nodemailer = require("nodemailer");
+const { PrismaClient } = require("@prisma/client");
+const prisma = new PrismaClient();
 
 // Configuración del transporter de nodemailer
 const transporter = nodemailer.createTransport({
